@@ -24,6 +24,7 @@ let persons = [
       }
 ]
 
+app.use(require('cors')());
 var morgan = require('morgan')
 app.use(express.json())
 morgan.token('body', req => {
