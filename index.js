@@ -26,7 +26,10 @@ let persons = [
 
 var morgan = require('morgan')
 app.use(express.json())
-app.use(morgan('tiny'))
+morgan.token('body', req => {
+    return JSON.stringify(req.body)
+  })
+app.use(morgan(':method :url :body'))
 
 app.get('/api/persons', (request, response) => {
   response.json(persons)
@@ -66,7 +69,6 @@ const isFound = (name) => persons.some(person => {
 
 app.post('/api/persons', (request, response) => {
     const body = request.body
-    console.log(body)
 
     if (!body.name || !body.number) {
         return response.status(400).json({ 
