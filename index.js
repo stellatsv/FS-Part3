@@ -24,7 +24,7 @@ app.get('/api/persons', (request, response) => {
 
 app.get('/info', (request, response) => {
     const time = Date().toLocaleString()
-    Person.countDocuments({age:{$gte:5}}, function (err, count) {
+    Person.countDocuments({}, function (err, count) {
       if (err){
           console.log(err)
       } else {
