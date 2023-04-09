@@ -4,14 +4,18 @@ const app = express()
 
 const Person = require('./models/person')
 
-app.use(express.static('build'))
 app.use(require('cors')());
 var morgan = require('morgan')
+app.use(express.static('build'))
 app.use(express.json())
+
 morgan.token('body', req => {
     return JSON.stringify(req.body)
 })
 app.use(morgan(':method :url :body'))
+
+
+
 
 app.get('/api/persons', (request, response) => {
   Person.find({}).then(person => {
@@ -62,10 +66,6 @@ app.delete('/api/persons/:id', (request, response) => {
     })
 })
 
-const generateId = () => {
-   return Math.floor(Math.random() * 100)
-}
-
 
 app.post('/api/persons', (request, response) => {
     const body = request.body
@@ -85,6 +85,25 @@ app.post('/api/persons', (request, response) => {
       response.json(savedPerson)
     })
 })
+
+const unknownEndpoint = (request, response) => {
+  response.status(404).send({ error: 'unknown endpoint' })
+}
+
+// handler of requests with unknown endpoint
+app.use(unknownEndpoint)
+
+const errorHandler = (error, request, response, next) => {
+  console.error(error.message)
+
+  if (error.name === 'CastError') {
+    return response.status(400).send({ error: 'malformatted id' })
+  } 
+
+  next(error)
+}
+app.use(errorHandler)
+
 
 app.listen(process.env.PORT || 3001, '0.0.0.0', () => {
   console.log("Server is running.");
