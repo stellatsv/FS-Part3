@@ -1,3 +1,4 @@
+
 require('dotenv').config()
 const express = require('express')
 const app = express()
@@ -15,8 +16,6 @@ morgan.token('body', req => {
 app.use(morgan(':method :url :body'))
 
 
-
-
 app.get('/api/persons', (request, response) => {
   Person.find({}).then(person => {
     response.json(person)
@@ -28,7 +27,7 @@ app.get('/info', (request, response) => {
     Person.countDocuments({age:{$gte:5}}, function (err, count) {
       if (err){
           console.log(err)
-      }else{
+      } else {
         response.send(`<p>Phonebook has info for ${count} people. </p>
         <p>${time}</p>`)
       }
@@ -50,7 +49,20 @@ app.get('/api/persons/:id', (request, response) => {
     
 })
  
+app.put('/api/persons/:id', (request, response) => {
+  const body = request.body
+  const person = {
+    name: body.name,
+    number: body.number,
+  }
 
+  Person.findByIdAndUpdate(request.params.id, person, { new: true })
+    .then(updatedPerson => {
+      response.json(updatedPerson)
+    })
+    .catch(error => next(error))
+  
+})
 
 app.delete('/api/persons/:id', (request, response) => {
     const person =  Person.findByIdAndRemove(request.params.id).then(result => {
